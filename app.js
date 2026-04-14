@@ -39,23 +39,12 @@ app.get('/alumnos', (req, res) => {
     return res.status(200).json(alumnos);
 });
 
-// GET /alumnos/:id
-app.get('/alumnos/:id', (req, res) => {
-    const alumno = alumnos.find(a => a.id == req.params.id);
-
-    if (!alumno) {
-        return res.status(404).json({ error: "Alumno no encontrado" });
-    }
-
-    return res.status(200).json(alumno);
-});
-
 // POST /alumnos
 app.post('/alumnos', (req, res) => {
     const error = validarCamposAlumno(req.body);
     if (error) return res.status(400).json({ error });
 
-    const existe = alumnos.find(a => a.id == req.body.id);
+    const existe = alumnos.find(a => a.id === req.body.id);
     if (existe) {
         return res.status(400).json({ error: "ID ya existe" });
     }
@@ -64,9 +53,20 @@ app.post('/alumnos', (req, res) => {
     return res.status(201).json(req.body);
 });
 
+// GET /alumnos/:id
+app.get('/alumnos/:id', (req, res) => {
+    const alumno = alumnos.find(a => a.id === Number(req.params.id));
+
+    if (!alumno) {
+        return res.status(404).json({ error: "Alumno no encontrado" });
+    }
+
+    return res.status(200).json(alumno);
+});
+
 // PUT /alumnos/:id
 app.put('/alumnos/:id', (req, res) => {
-    const alumno = alumnos.find(a => a.id == req.params.id);
+    const alumno = alumnos.find(a => a.id === Number(req.params.id));
 
     if (!alumno) {
         return res.status(404).json({ error: "Alumno no encontrado" });
@@ -84,7 +84,7 @@ app.put('/alumnos/:id', (req, res) => {
 
 // DELETE /alumnos/:id
 app.delete('/alumnos/:id', (req, res) => {
-    const index = alumnos.findIndex(a => a.id == req.params.id);
+    const index = alumnos.findIndex(a => a.id === Number(req.params.id));
 
     if (index === -1) {
         return res.status(404).json({ error: "Alumno no encontrado" });
@@ -104,23 +104,12 @@ app.get('/profesores', (req, res) => {
     return res.status(200).json(profesores);
 });
 
-// GET /profesores/:id
-app.get('/profesores/:id', (req, res) => {
-    const profesor = profesores.find(p => p.id == req.params.id);
-
-    if (!profesor) {
-        return res.status(404).json({ error: "Profesor no encontrado" });
-    }
-
-    return res.status(200).json(profesor);
-});
-
 // POST /profesores
 app.post('/profesores', (req, res) => {
     const error = validarCamposProfesor(req.body);
     if (error) return res.status(400).json({ error });
 
-    const existe = profesores.find(p => p.id == req.body.id);
+    const existe = profesores.find(p => p.id === req.body.id);
     if (existe) {
         return res.status(400).json({ error: "ID ya existe" });
     }
@@ -129,9 +118,20 @@ app.post('/profesores', (req, res) => {
     return res.status(201).json(req.body);
 });
 
+// GET /profesores/:id
+app.get('/profesores/:id', (req, res) => {
+    const profesor = profesores.find(p => p.id === Number(req.params.id));
+
+    if (!profesor) {
+        return res.status(404).json({ error: "Profesor no encontrado" });
+    }
+
+    return res.status(200).json(profesor);
+});
+
 // PUT /profesores/:id
 app.put('/profesores/:id', (req, res) => {
-    const profesor = profesores.find(p => p.id == req.params.id);
+    const profesor = profesores.find(p => p.id === Number(req.params.id));
 
     if (!profesor) {
         return res.status(404).json({ error: "Profesor no encontrado" });
@@ -149,7 +149,7 @@ app.put('/profesores/:id', (req, res) => {
 
 // DELETE /profesores/:id
 app.delete('/profesores/:id', (req, res) => {
-    const index = profesores.findIndex(p => p.id == req.params.id);
+    const index = profesores.findIndex(p => p.id === Number(req.params.id));
 
     if (index === -1) {
         return res.status(404).json({ error: "Profesor no encontrado" });
@@ -161,18 +161,45 @@ app.delete('/profesores/:id', (req, res) => {
 });
 
 // =======================
-// RUTA NO ENCONTRADA (IMPORTANTE PARA TESTS)
+// 405 METHOD NOT ALLOWED
 // =======================
-app.use((req, res) => {
-    return res.status(404).json({ error: "Ruta no encontrada" });
+
+// alumnos sin ID
+app.all('/alumnos', (req, res) => {
+    if (!['GET', 'POST'].includes(req.method)) {
+        return res.status(405).json({ error: "Método no permitido" });
+    }
+});
+
+// alumnos con ID
+app.all('/alumnos/:id', (req, res) => {
+    if (!['GET', 'PUT', 'DELETE'].includes(req.method)) {
+        return res.status(405).json({ error: "Método no permitido" });
+    }
+});
+
+// profesores sin ID
+app.all('/profesores', (req, res) => {
+    if (!['GET', 'POST'].includes(req.method)) {
+        return res.status(405).json({ error: "Método no permitido" });
+    }
+});
+
+// profesores con ID
+app.all('/profesores/:id', (req, res) => {
+    if (!['GET', 'PUT', 'DELETE'].includes(req.method)) {
+        return res.status(405).json({ error: "Método no permitido" });
+    }
 });
 
 // =======================
-// EXPORT (CLAVE PARA TESTS)
+// EXPORT PARA TESTS
 // =======================
 module.exports = app;
 
-// SOLO levantar servidor si no está en testing
+// =======================
+// START SERVER
+// =======================
 if (require.main === module) {
     app.listen(3000, '0.0.0.0', () => {
         console.log("Servidor corriendo en puerto 3000");

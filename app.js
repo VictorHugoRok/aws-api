@@ -41,7 +41,7 @@ app.get('/alumnos', (req, res) => {
 
 // GET /alumnos/:id
 app.get('/alumnos/:id', (req, res) => {
-    const alumno = alumnos.find(a => a.id === Number(req.params.id));
+    const alumno = alumnos.find(a => a.id == req.params.id);
 
     if (!alumno) {
         return res.status(404).json({ error: "Alumno no encontrado" });
@@ -55,7 +55,7 @@ app.post('/alumnos', (req, res) => {
     const error = validarCamposAlumno(req.body);
     if (error) return res.status(400).json({ error });
 
-    const existe = alumnos.find(a => a.id === req.body.id);
+    const existe = alumnos.find(a => a.id == req.body.id);
     if (existe) {
         return res.status(400).json({ error: "ID ya existe" });
     }
@@ -66,7 +66,7 @@ app.post('/alumnos', (req, res) => {
 
 // PUT /alumnos/:id
 app.put('/alumnos/:id', (req, res) => {
-    const alumno = alumnos.find(a => a.id === Number(req.params.id));
+    const alumno = alumnos.find(a => a.id == req.params.id);
 
     if (!alumno) {
         return res.status(404).json({ error: "Alumno no encontrado" });
@@ -84,7 +84,7 @@ app.put('/alumnos/:id', (req, res) => {
 
 // DELETE /alumnos/:id
 app.delete('/alumnos/:id', (req, res) => {
-    const index = alumnos.findIndex(a => a.id === Number(req.params.id));
+    const index = alumnos.findIndex(a => a.id == req.params.id);
 
     if (index === -1) {
         return res.status(404).json({ error: "Alumno no encontrado" });
@@ -106,7 +106,7 @@ app.get('/profesores', (req, res) => {
 
 // GET /profesores/:id
 app.get('/profesores/:id', (req, res) => {
-    const profesor = profesores.find(p => p.id === Number(req.params.id));
+    const profesor = profesores.find(p => p.id == req.params.id);
 
     if (!profesor) {
         return res.status(404).json({ error: "Profesor no encontrado" });
@@ -120,7 +120,7 @@ app.post('/profesores', (req, res) => {
     const error = validarCamposProfesor(req.body);
     if (error) return res.status(400).json({ error });
 
-    const existe = profesores.find(p => p.id === req.body.id);
+    const existe = profesores.find(p => p.id == req.body.id);
     if (existe) {
         return res.status(400).json({ error: "ID ya existe" });
     }
@@ -131,7 +131,7 @@ app.post('/profesores', (req, res) => {
 
 // PUT /profesores/:id
 app.put('/profesores/:id', (req, res) => {
-    const profesor = profesores.find(p => p.id === Number(req.params.id));
+    const profesor = profesores.find(p => p.id == req.params.id);
 
     if (!profesor) {
         return res.status(404).json({ error: "Profesor no encontrado" });
@@ -149,7 +149,7 @@ app.put('/profesores/:id', (req, res) => {
 
 // DELETE /profesores/:id
 app.delete('/profesores/:id', (req, res) => {
-    const index = profesores.findIndex(p => p.id === Number(req.params.id));
+    const index = profesores.findIndex(p => p.id == req.params.id);
 
     if (index === -1) {
         return res.status(404).json({ error: "Profesor no encontrado" });
@@ -158,6 +158,13 @@ app.delete('/profesores/:id', (req, res) => {
     profesores.splice(index, 1);
 
     return res.status(200).json({ mensaje: "Profesor eliminado" });
+});
+
+// =======================
+// RUTA NO ENCONTRADA (IMPORTANTE PARA TESTS)
+// =======================
+app.use((req, res) => {
+    return res.status(404).json({ error: "Ruta no encontrada" });
 });
 
 // =======================
